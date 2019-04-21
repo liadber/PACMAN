@@ -30,7 +30,66 @@
 
 
 <body>
-    <div id ="header">
+    <script type="text/javascript">
+        //asked for a user to be existing in array:
+        var defultUser= {
+            user_name: "a",
+            password: "a",
+            first_name: "a",
+            last_name: "a",
+            mail: "a@gmail.com",
+            birthday: {
+                day: "1",
+                month: "2",
+                year: "3"
+            }
+        };
+        var users=[defultUser];
+        function addToArray(userName,password,firstName,lastName,mail,day, month, year){
+            if(checkExistingUserName(userName))
+                return false;//cant add- username exist in system
+            var birthday= {
+                day: day,
+                month: month,
+                year: year,
+            };
+            var newUser={
+                user_name: userName,
+                password: password,
+                first_name: firstName,
+                last_name: lastName,
+                mail: mail,
+                birthday: birthday
+            };
+            users.push(newUser);
+            return true;
+        }
+        function search(username, passWord) {
+            var length=users.length;
+            for(i=0; i<length;i++){
+                var user=users[i];
+                if(user.user_name==username){
+                    if(user.password==passWord){
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            return false;
+        }
+        function checkExistingUserName(userName){
+            var length=users.length;
+            for(i=0; i<length;i++){
+                var user=users[i];
+                if(user.user_name==userName){
+                    return true;
+                }
+            }
+            return false;
+        }
+    </script>
+
+    <divï¿½id ="header">
         <div ="menu">
 
 
@@ -77,8 +136,8 @@
                 <li><a id="about">About</a></li>
             </ul>
         </div><!--end menu-->
-        </div><!--end header -->
-        <div id ="content">
+        </div><!--endï¿½headerï¿½-->
+        <divï¿½id ="content">
             <section id="welcome">
                 <table width="100%">
                     <tr><button onclick="ShowSection('signup')" href="#">Sign Up</button></tr>
@@ -509,8 +568,8 @@
                 </div>
             </section>
 
-            <div id ="footer">
+            <divï¿½id ="footer">
                 </div>
-                <!-- end footer-- > </div ><!-- end content-->
+                <!-- endï¿½footer-- > </div ><!-- endï¿½content-->
                 </body> </html>
                     
