@@ -226,35 +226,64 @@
                         <h1>Sign Up</h1>
                         <p>Please fill in this form to create an account.</p>
                         <hr>
+                        <label for="user_name"><b>Password</b></label>
+                        <input id="user_name" type="text" placeholder="Enter user name" name="user_name">
+                        <br />
+
+                        <label for="pass_w"><b>Password</b></label>
+                        <input id="pass_w" type="password" placeholder="Enter Password" name="pass_w">
+                        <br />
 
                         <label for="firstname"><b>First Name</b></label>
-                        <input type="text" placeholder="Enter First Name" name="firstname">
+                        <input id="firstname" type="text" placeholder="Enter First Name" name="firstname">
                         <br />
 
                         <label for="lastname"><b>Last Name</b></label>
-                        <input type="text" placeholder="Enter Last Name" name="lastname">
+                        <input id="lastname" type="text" placeholder="Enter Last Name" name="lastname">
+                        <br />
+
+                        <label for="email"><b>Email</b></label>
+                        <input id="email" type="text" placeholder="Enter Email" name="email">
                         <br />
 
                         <label for="birthday"><b>Bitrh date</b></label>
-                        <input type="date" placeholder="Enter your birth date" name="birthday">
-                        <br /><br />
-
-                        <label for="email"><b>Email</b></label>
-                        <input type="text" placeholder="Enter Email" name="email">
+                        <input id="birthday" type="date" placeholder="Enter your birth date" name="birthday">
+                        <br />
                         <br />
 
-                        <label for="psw"><b>Password</b></label>
-                        <input type="password" placeholder="Enter Password" name="psw">
-                        <br />
+
 
                         <div class="clearfix">
                             <button type="button" class="cancelbtn">Cancel</button>
                             <script type="text/javascript" src="jquery.js"></script>
-                            <button type="submit" class="signupbtn" id="signupbtnid">Sign Up</button>
+                            <button type="submit" class="signupbtn" id="signupbtnid" onclick="signup()">Sign Up</button>
                         </div>
                     </div>
                 </form>
-            </section>
+                <script type="text/javascript">
+                    function signup(){
+                        var userName=document.getElementById("user_name").value;
+                        var password=document.getElementById("pass_w").value;
+                        var firstname=document.getElementById("firstname").value;
+                        var lastname=document.getElementById("lastname").value;
+                        var email=document.getElementById("email").value;
+                        var birthday=document.getElementById("birthday").value;
+                        var date=birthday.split("-");
+                        var day=date[2];
+                        var month=date[1];
+                        var year=date[0];
+                        //todo checks!
+                        isSuccess=addToArray(userName,password,firstname,lastname,email,day,month,year);
+                        if(!isSuccess){
+                            window.alert("user name already exist. Please pick new one and try again");
+                        }
+                        else{
+                            window.alert("User added successfully!");
+                        }
+                    }
+                </script>
+                    </section>
+
             <section id="settings" display="none">
                 <br />
                 <label for="ballsnum"><b>Balls Number</b></label>
@@ -264,6 +293,7 @@
                 <input id="gameTime" placeholder="Please define game time. minimum:60(sec)" type="number" name="ttlgametime" />
                 <br />
             </section>
+
             <section id="aboutSection" display="none">
                 <style>
                     /* The Modal (background) */
@@ -326,36 +356,40 @@
                         </div>
                     </div>
 
-                </div>
+                    <script>
+                        // Get the modal
+                        var modal = document.getElementById('myModal');
 
-                <script>
-                    // Get the modal
-                    var modal = document.getElementById('myModal');
+                        // Get the button that opens the modal
+                        var btn = document.getElementById("about");
 
-                    // Get the button that opens the modal
-                    var btn = document.getElementById("about");
+                        // Get the <span> element that closes the modal
+                        var span = document.getElementsByClassName("close")[0];
 
-                    // Get the <span> element that closes the modal
-                    var span = document.getElementsByClassName("close")[0];
+                        // When the user clicks the button, open the modal
+                        btn.onclick = function () {
+                            modal.style.display = "block";
+                        }
 
-                    // When the user clicks the button, open the modal
-                    btn.onclick = function () {
-                        modal.style.display = "block";
-                    }
-
-                    // When the user clicks on <span> (x), close the modal
-                    span.onclick = function () {
-                        modal.style.display = "none";
-                    }
-
-                    // When the user clicks anywhere outside of the modal, close it
-                    window.onclick = function (event) {
-                        if (event.target == modal) {
+                        // When the user clicks on <span> (x), close the modal
+                        span.onclick = function () {
                             modal.style.display = "none";
                         }
-                    }
 
-                </script>
+                        // When the user clicks anywhere outside of the modal, close it
+                        window.onclick = function (event) {
+                            if (event.target == modal) {
+                                modal.style.display = "none";
+                            }
+                            else{
+                                event.preventDefault();
+                            }
+                        }
+
+                    </script>
+
+                </div>
+
             </section>
             <section id="login" display="none">
                 <form action="/action_page.php" id="loginForm" style="border:1px solid #ccc">
@@ -365,19 +399,35 @@
                         <hr>
 
                         <label for="username"><b>User Name</b></label>
-                        <input type="text" placeholder="Enter User Name" name="username">
+                        <input id="username" type="text" placeholder="Enter User Name" name="username">
                         <br />
 
                         <label for="psw"><b>Password</b></label>
-                        <input type="password" placeholder="Enter Password" name="psw">
+                        <input id="psw" type="password" placeholder="Enter Password" name="psw">
                         <br />
 
                         <div class="clearfix">
                             <script type="text/javascript" src="jquery.js"></script>
-                            <button type="submit" class="signinbtn" id="signinbtnid">Sign In</button>
+                            <button type="submit" class="signinbtn" id="signinbtnid" onclick="loginUser()">Sign In</button>
                         </div>
                     </div>
                 </form>
+                <script type="text/javascript">
+                function loginUser(){
+                    var userName=document.getElementById("username").value;
+                    var password=document.getElementById("psw").value;
+                    isSuccess=search(userName,password);
+                    if(!isSuccess){
+                        window.alert("User name or password are incorrect. Please try again.")
+                    }
+                    else{
+                        //todo open the game
+                        //just for now check:
+                        window.alert("good.")
+
+                    }
+                }
+                </script>
                 <div name="game">
                     <button id="start" onclick="Start()">Start</button>
                     SCORE:
