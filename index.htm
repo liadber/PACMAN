@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>Single Page Navigation</title>
+    <title>Pacman - Liad and Amit</title>
     <script type="text/javascript">
         function PageLoaded() {
             ShowSection('welcome');
@@ -89,8 +89,8 @@
         }
     </script>
 
-    <div�id ="header">
-        <div ="menu">
+    <div id ="header">
+        <div id="menu">
 
 
             <style>
@@ -286,11 +286,77 @@
 
             <section id="settings" display="none">
                 <br />
-                <label for="ballsnum"><b>Balls Number</b></label>
+                <label for="ballNumbe"><b>Balls Number</b></label>
                 <input id="ballNumbe" placeholder="minimum:50 maximum:90" type="number" name="ballsnum">
                 <br />
-                <label for="ttlgametime"><b>Game Time</b></label>
+                <label for="gameTime"><b>Game Time</b></label>
                 <input id="gameTime" placeholder="Please define game time. minimum:60(sec)" type="number" name="ttlgametime" />
+                <br />
+
+                <!--choose keys-->
+                <label for="upArrowInput"><b>Key for Up</b></label>
+                <button id="upArrowInput">Click and Choose Up Key</button>
+                <br />
+
+                <label for="downArrowInput"><b>Key for Down</b></label>
+                <button id="downArrowInput" >Click and Choose Down Key</button>
+                <br />
+
+                <label for="leftArrowInput"><b>Key for Left</b></label>
+                <button id="leftArrowInput">Click and Choose Left Key</button>
+                <br />
+
+                <label for="rightArrowInput"><b>Key for Right</b></label>
+                <button id="rightArrowInput">Click and Choose Right Key</button>
+                <br />
+
+                <script>
+                    var UP='ArrowUp';
+                    var DOWN='ArrowDown';
+                    var RIGHT='ArrowRight';
+                    var LEFT='ArrowLeft';
+                    document.getElementById("upArrowInput").addEventListener("click", function (e) {
+                        document.addEventListener("keydown", changeUp);
+                        document.getElementById("upArrowInput").innerText="Please press a key now!";
+                    }, false);
+                    function changeUp(e) {
+                        UP=e.code;
+                        document.getElementById("upArrowInput").innerText=e.code;
+                        // remove this handler
+                        document.removeEventListener("keydown",changeUp);
+                    }
+                    document.getElementById("downArrowInput").addEventListener("click", function (e) {
+                        document.addEventListener("keydown", changeDown);
+                        document.getElementById("downArrowInput").innerText="Please press a key now!";
+                    }, false);
+                    function changeDown(e) {
+                        DOWN=e.code;
+                        document.getElementById("downArrowInput").innerText=e.code;
+                        // remove this handler
+                        document.removeEventListener("keydown",changeDown);
+                    }
+                    document.getElementById("leftArrowInput").addEventListener("click", function (e) {
+                        document.addEventListener("keydown", changeLeft);
+                        document.getElementById("leftArrowInput").innerText="Please press a key now!";
+                    }, false);
+                    function changeLeft(e) {
+                        LEFT=e.code;
+                        document.getElementById("leftArrowInput").innerText=e.code;
+                        // remove this handler
+                        document.removeEventListener("keydown",changeLeft);
+                    }
+                    document.getElementById("rightArrowInput").addEventListener("click", function (e) {
+                        document.addEventListener("keydown", changeRight);
+                        document.getElementById("rightArrowInput").innerText="Please press a key now!";
+                    }, false);
+                    function changeRight(e) {
+                        RIGHT=e.code;
+                        document.getElementById("rightArrowInput").innerText=e.code;
+                        // remove this handler
+                        document.removeEventListener("keydown",changeRight);
+                    }
+                </script>
+                <!--end choose keys-->
                 <br />
             </section>
 
@@ -525,16 +591,16 @@
                      * @return {number}
                      */
                     function GetKeyPressed() {
-                        if (keysDown['ArrowUp']) {
+                        if (keysDown[UP]) {
                             return 1;
                         }
-                        if (keysDown['ArrowDown']) {
+                        if (keysDown[DOWN]) {
                             return 2;
                         }
-                        if (keysDown['ArrowLeft']) {
+                        if (keysDown[LEFT]) {
                             return 3;
                         }
-                        if (keysDown['ArrowRight']) {
+                        if (keysDown[RIGHT]) {
                             return 4;
                         }
                     }
@@ -618,7 +684,7 @@
                 </div>
             </section>
 
-            <div�id ="footer">
+            <div id ="footer">
                 </div>
                 <!-- end�footer-- > </div ><!-- end�content-->
                 </body> </html>
