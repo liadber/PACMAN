@@ -5,6 +5,8 @@
 <head>
     <title>Pacman - Liad and Amit</title>
     <script type="text/javascript">
+        var isLoggedIn=false;
+        var user_name;
         function PageLoaded() {
             ShowSection('welcome');
         }
@@ -286,13 +288,18 @@
 
             <section id="settings" display="none">
                 <br />
-                <label for="ballNumbe"><b>Balls Number</b></label>
-                <input id="ballNumbe" placeholder="minimum:50 maximum:90" type="number" name="ballsnum">
+                <label for="ballNumbe"><b>Balls Number (minimum:50 maximum:90)</b></label>
+                <input id="ballNumbe" placeholder="minimum:50 maximum:90" type="number" name="ballsnum" value="50">
                 <br />
-                <label for="gameTime"><b>Game Time</b></label>
-                <input id="gameTime" placeholder="Please define game time. minimum:60(sec)" type="number" name="ttlgametime" />
+                <label for="gameTime"><b>Game Time (minimum:60(sec))</b></label>
+                <input id="gameTime" placeholder="Please define game time. minimum:60(sec)" type="number" name="ttlgametime"value="60" />
                 <br />
-
+                <button id="random" onclick="randomize()">Click for random balls bumber and time</button>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
                 <!--choose keys-->
                 <label for="upArrowInput"><b>Key for Up</b></label>
                 <button id="upArrowInput">Click and Choose Up Key</button>
@@ -354,6 +361,12 @@
                         document.getElementById("rightArrowInput").innerText=e.code;
                         // remove this handler
                         document.removeEventListener("keydown",changeRight);
+                    }
+                    function randomize() {
+                        var balls_number=50+Math.floor(Math.random() * 40);
+                        var time=60+Math.floor(Math.random()*60)
+                        document.getElementById("ballNumbe").value=balls_number;
+                        document.getElementById("gameTime").value=time;
                     }
                 </script>
                 <!--end choose keys-->
@@ -488,9 +501,9 @@
                     }
                     else{
                         //todo open the game
-                        //just for now check:
-                        window.alert("good.")
-
+                        window.alert("You may play the game now!")
+                        isLoggedIn=true;
+                        user_name=userName;
                     }
                 }
                 </script>
@@ -513,9 +526,15 @@
                     var time_elapsed;
                     var interval;
                     var _maxTime;
-                    var _ballsNumb
+                    var _ballsNumb;
+                    var is_time_over=false;
+                    var packman_last_move="right"
 
                     function SettingIsValid() {
+                        if(!isLoggedIn){
+                            window.alert("Please log in before you play a game!.")
+                            return false;
+                        }
                         if (ballNumbe.value < 50 || ballNumbe.value > 90) {
                             window.alert("Please define a balls number minimum 50  or maximum 90.")
                             return false;
@@ -529,8 +548,8 @@
                     function Start() {
 
                         if (SettingIsValid()) {
-                            _ballsNumb = ballNumbe;
-                            _maxTime = gameTime;
+                            _ballsNumb = document.getElementById("ballNumbe").value;
+                            _maxTime = document.getElementById("gameTime").value;
                             board = new Array();
                             score = 0;
                             pac_color = "yellow";
@@ -574,7 +593,7 @@
                             addEventListener("keyup", function (e) {
                                 keysDown[e.code] = false;
                             }, false);
-                            interval = setInterval(UpdatePosition, 250);
+                            interval = setInterval(UpdatePosition, 170);
 
                         }//\if setting is valid
                     }                   
@@ -608,6 +627,16 @@
                         context.clearRect(0, 0, canvas.width, canvas.height); //clean board
                         lblScore.value = score;
                         lblTime.value = time_elapsed;
+                        //draw the user name on canvas
+                        gradient = context.createLinearGradient(0, 0, canvas.width, 0);
+                        gradient.addColorStop("0", "red");
+                        gradient.addColorStop(".25", "yellow");
+                        gradient.addColorStop(".50", "green");
+                        gradient.addColorStop(".75", "blue");
+                        gradient.addColorStop("1.0", "magenta");
+                        context.font = "italic 700 25px Unknown Font, sans-serif";
+                        context.fillStyle = gradient;
+                        context.fillText(user_name+" good luck!", 20, 20, 100);
 
                         for (var i = 0; i < 10; i++) {
                             for (var j = 0; j < 10; j++) {
@@ -615,13 +644,37 @@
                                 center.x = i * 60 + 30;
                                 center.y = j * 60 + 30;
                                 if (board[i][j] === 2) {
+                                    var big_first=0.15 ;
+                                    var big_second=1.85 ;
+                                    var eye_x=5;
+                                    var eye_y=-15;
+                                    if(packman_last_move!="right"){
+                                        if(packman_last_move=="left"){
+                                            big_first=1.15
+                                            big_second=0.85
+                                            eye_x=-5;
+                                            eye_y=-15;
+                                        }
+                                        else if(packman_last_move=="up"){
+                                            big_first=1.65
+                                            big_second=1.35
+                                            eye_x=-15;
+                                            eye_y=-10;
+                                        }
+                                        else{//down
+                                            big_first=0.65
+                                            big_second=0.35
+                                            eye_x=15;
+                                            eye_y=10;
+                                        }
+                                    }
                                     context.beginPath();
-                                    context.arc(center.x, center.y, 30, 0.15 * Math.PI, 1.85 * Math.PI); // half circle
+                                    context.arc(center.x, center.y, 30, big_first* Math.PI,big_second* Math.PI ); // half circle
                                     context.lineTo(center.x, center.y);
                                     context.fillStyle = pac_color; //color
                                     context.fill();
                                     context.beginPath();
-                                    context.arc(center.x + 5, center.y - 15, 5, 0, 2 * Math.PI); // circle
+                                    context.arc(center.x + eye_x, center.y +eye_y, 5, 0, 2 * Math.PI); // circle
                                     context.fillStyle = "black"; //color
                                     context.fill();
                                 } else if (board[i][j] === 1) {
@@ -638,27 +691,32 @@
                             }
                         }
                     }
+
                     function UpdatePosition() {
                         board[shape.i][shape.j] = 0;
                         var x = GetKeyPressed();
                         if (x === 1) {
                             if (shape.j > 0 && board[shape.i][shape.j - 1] !== 4) {
                                 shape.j--;
+                                packman_last_move="up";
                             }
                         }
                         if (x === 2) {
                             if (shape.j < 9 && board[shape.i][shape.j + 1] !== 4) {
                                 shape.j++;
+                                packman_last_move="down";
                             }
                         }
                         if (x === 3) {
                             if (shape.i > 0 && board[shape.i - 1][shape.j] !== 4) {
                                 shape.i--;
+                                packman_last_move="left";
                             }
                         }
                         if (x === 4) {
                             if (shape.i < 9 && board[shape.i + 1][shape.j] !== 4) {
                                 shape.i++;
+                                packman_last_move="right";
                             }
                         }
                         if (board[shape.i][shape.j] === 1) {
@@ -673,9 +731,10 @@
                         if (score === 50) {
                             window.clearInterval(interval);
                             window.alert("Game completed");
-                        } if (time_elapsed > _maxTime){
+                        } if (time_elapsed > _maxTime&&!is_time_over){
                             window.clearInterval(interval);
                             window.alert("Time is over.");
+                            is_time_over=true;
                         } else {
                             Draw();
                         }
