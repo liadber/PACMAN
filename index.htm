@@ -5,7 +5,7 @@
 <head>
     <title>Pacman - Liad and Amit</title>
     <script type="text/javascript">
-        var isLoggedIn=false;
+        var isLoggedIn=true;
         var user_name;
         function PageLoaded() {
             ShowSection('welcome');
@@ -594,6 +594,9 @@
                     var num_of_first_balls;
                     var num_of_second_balls;
                     var num_of_third_balls;
+                    var ball_eaten_monster1=0;
+                    var ball_eaten_monster2=0;
+                    var ball_eaten_monster3=0;
                     //defnition to the numbers on the board:
                     //0 nothing
                     //11- 5 point 60%
@@ -622,6 +625,89 @@
                             return false;
                         }
                         return true;
+                    }
+                    function addFood(i, j) {
+                        var random = Math.random();
+                        if (random <= 0.6 && num_of_first_balls > 0) {
+                            num_of_first_balls -= 1;
+                            board[i][j] = 11;
+                        }
+                        else if (random <= 0.6)//no 5 point ball left:50-50 per to what food
+                        {
+                            if (random <= 0.3 && num_of_second_balls > 0) {
+                                num_of_second_balls -= 1;
+                                board[i][j] = 12;
+                            }
+                            else if (random < 0.3)//no second remain
+                            {
+                                num_of_third_balls -= 1;
+                                board[i][j] = 13;
+                            }
+                            else {//random>=0.3-try third 25 points
+                                if (num_of_third_balls > 0) {
+                                    num_of_third_balls -= 1;
+                                    board[i][j] = 13;
+                                }
+                                else {//only 15 left
+                                    num_of_second_balls -= 1;
+                                    board[i][j] = 12;
+                                }
+                            }
+                        }
+                        else if (random <= 0.9 && num_of_second_balls > 0)//try add the 2nd - 0.6<=random<=0.9
+                        {
+                            num_of_second_balls -= 1;
+                            board[i][j] = 12;
+                        }
+                        else if (random <= 0.9)// 0.6<=random<=0.9- middle 0.75 no 15 points left
+                        {
+                            if (random <= 0.75 && num_of_first_balls > 0) {
+                                num_of_first_balls -= 1;
+                                board[i][j] = 11;
+                            }
+                            else if (random < 0.75)//no first remain
+                            {
+                                num_of_third_balls -= 1;
+                                board[i][j] = 13;
+                            }
+                            else {//random>=0.75-try third 25 points
+                                if (num_of_third_balls > 0) {
+                                    num_of_third_balls -= 1;
+                                    board[i][j] = 13;
+                                }
+                                else {//only third left
+                                    num_of_first_balls -= 1;
+                                    board[i][j] = 11;
+                                }
+                            }
+                        }
+                        else {//random>=0.9 - try add the 25 points
+                            if (num_of_third_balls > 0) {
+                                num_of_third_balls -= 1;
+                                board[i][j] = 13;
+                            }
+                            else {//no third left
+                                if (random <= 0.95 && num_of_first_balls > 0) {
+                                    num_of_first_balls -= 1;
+                                    board[i][j] = 11;
+                                }
+                                else if (random <= 0.95)//no first remain
+                                {
+                                    num_of_second_balls -= 1;
+                                    board[i][j] = 12;
+                                }
+                                else {//random>=0.95-try second 15 points
+                                    if (num_of_third_balls > 0) {
+                                        num_of_second_balls -= 1;
+                                        board[i][j] = 12;
+                                    }
+                                    else {//only second left
+                                        num_of_first_balls -= 1;
+                                        board[i][j] = 11;
+                                    }
+                                }
+                            }
+                        }
                     }
                     function Start() {
 
@@ -665,10 +751,10 @@
                                             board[i][j] = 71
                                     }else {
                                         var randomNum = Math.random();
-                                        if (randomNum <= 1.0 * food_remain / cnt) {
+                                        if (randomNum <= 1.0 * food_remain / cnt) {//add random food
+                                            addFood(i,j);
 
                                             food_remain--;
-                                            board[i][j] = 1;
                                         } else if (randomNum < 1.0 * (pacman_remain + food_remain) / cnt) {
                                             shape.i = i;
                                             shape.j = j;
@@ -684,7 +770,7 @@
                             }
                             while (food_remain > 0) {
                                 var emptyCell = findRandomEmptyCell(board);
-                                board[emptyCell[0]][emptyCell[1]] = 1;
+                                addFood(emptyCell[0],emptyCell[1])
                                 food_remain--;
                             }
                             keysDown = {};
@@ -779,10 +865,25 @@
                                     context.arc(center.x + eye_x, center.y +eye_y, 5, 0, 2 * Math.PI); // circle
                                     context.fillStyle = "black"; //color
                                     context.fill();
-                                } else if (board[i][j] === 1) {
+                                } else if (board[i][j] === 11||board[i][j]===12||board[i][j]===13) {
+                                    var color="black";
+                                    var size=15;
+                                    if(board[i][j]===11){
+                                        color=document.getElementById("firstBall").value;
+                                        size=15;
+                                    }
+                                    else if(board[i][j]===12){
+                                        color=document.getElementById("secondBall").value;
+                                        size=20;
+                                    }
+                                    else{//===13
+                                        color=document.getElementById("thirdBall").value;
+                                        size=25;
+                                    }
+                                    color="#"+color;
                                     context.beginPath();
-                                    context.arc(center.x, center.y, 15, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
+                                    context.arc(center.x, center.y, size, 0, 2 * Math.PI); // circle
+                                    context.fillStyle = color; //color
                                     context.fill();
                                 } else if (board[i][j] === 4) {
                                     context.beginPath();
@@ -955,8 +1056,16 @@
                                 packman_last_move="right";
                             }
                         }
-                        if (board[shape.i][shape.j] === 1) {
-                            score+=1;
+                        if (board[shape.i][shape.j] === 11||board[shape.i][shape.j] === 12||board[shape.i][shape.j] === 13) {
+                            if(board[shape.i][shape.j] === 11){
+                                score+=5;
+                            }
+                            else if(board[shape.i][shape.j] === 12){
+                                score+=15;
+                            }
+                            else{
+                                score+=25;
+                            }
                         }
                         if(is_eaten() ){//loss
                             num_life-=1;
