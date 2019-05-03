@@ -598,6 +598,7 @@
                     var ball_eaten_monster2=0;
                     var ball_eaten_monster3=0;
                     var start_monsters_movement=false;
+                    var move_monster_now=true;
                     //defnition to the numbers on the board:
                     //0 nothing
                     //11- 5 point 60%
@@ -883,9 +884,6 @@
                                     context.fillStyle = "grey"; //color
                                     context.fill();
                                 } else if(board[i][j] === 50||board[i][j]===51)  {//first monster
-                                    if(start_monsters_movement){
-                                        print("here")
-                                    }
                                     context.beginPath();
                                     context.arc(center.x , center.y , 30, 0, 2 * Math.PI); // circle
                                     context.fillStyle = "red"; //color
@@ -1029,7 +1027,7 @@
                                     board[i][j]=51;
                                 }
                                 else{//there is no food
-                                    board[j][j]=50;
+                                    board[i][j]=50;
                                 }
                                 //prev position
                                 if(board[i][j+1]===51){//there was food
@@ -1056,7 +1054,7 @@
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
-                                    board[j][j]=60;
+                                    board[i][j]=60;
                                 }
                                 //prev position
                                 if(board[i][j+1]===61){//there was food
@@ -1084,7 +1082,7 @@
                                     board[i][j]=71;
                                 }
                                 else{//there is no food
-                                    board[j][j]=70;
+                                    board[i][j]=70;
                                 }
                                 //prev position
                                 if(board[i][j+1]===71){//there was food
@@ -1121,7 +1119,7 @@
                                     board[i][j]=51;
                                 }
                                 else{//there is no food
-                                    board[j][j]=50;
+                                    board[i][j]=50;
                                 }
                                 //prev position
                                 if(board[i][j-1]===51){//there was food
@@ -1149,7 +1147,7 @@
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
-                                    board[j][j]=60;
+                                    board[i][j]=60;
                                 }
                                 //prev position
                                 if(board[i][j-1]===61){//there was food
@@ -1177,7 +1175,7 @@
                                     board[i][j]=71;
                                 }
                                 else{//there is no food
-                                    board[j][j]=70;
+                                    board[i][j]=70;
                                 }
                                 //prev position
                                 if(board[i][j-1]===71){//there was food
@@ -1214,7 +1212,7 @@
                                     board[i][j]=51;
                                 }
                                 else{//there is no food
-                                    board[j][j]=50;
+                                    board[i][j]=50;
                                 }
                                 //prev position
                                 if(board[i-1][j]===51){//there was food
@@ -1241,7 +1239,7 @@
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
-                                    board[j][j]=60;
+                                    board[i][j]=60;
                                 }
                                 //prev position
                                 if(board[i-1][j]===61){//there was food
@@ -1269,7 +1267,7 @@
                                     board[i][j]=71;
                                 }
                                 else{//there is no food
-                                    board[j][j]=70;
+                                    board[i][j]=70;
                                 }
                                 //prev position
                                 if(board[i-1][j]===71){//there was food
@@ -1290,8 +1288,15 @@
 
                     function tryLeft(i,j,monsterNum){
                         if(board[i-1][j]!=4){//no wall can go up
+                            //prev position
+                            if(board[i][j]===51){//there was food
+                                board[i][j]=ball_eaten_monster1;
+                            }
+                            else{//there wasnt food
+                                board[i][j]=0;
+                            }
                             i=i-1;
-                            
+
                             if(monsterNum===1){//monster number 1
                                 //next position
                                 if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
@@ -1307,15 +1312,9 @@
                                     board[i][j]=51;
                                 }
                                 else{//there is no food
-                                    board[j][j]=50;
+                                    board[i][j]=50;
                                 }
-                                //prev position
-                                if(board[i+1][j]===51){//there was food
-                                    board[i+1][j]=ball_eaten_monster1;
-                                }
-                                else{//there wasnt food
-                                    board[i+1][j]=0;
-                                }
+
                                 location_monster1=[i,j]
 
                             }
@@ -1335,7 +1334,7 @@
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
-                                    board[j][j]=60;
+                                    board[i][j]=60;
                                 }
                                 //prev position
                                 if(board[i+1][j]===61){//there was food
@@ -1363,7 +1362,7 @@
                                     board[i][j]=71;
                                 }
                                 else{//there is no food
-                                    board[j][j]=70;
+                                    board[i][j]=70;
                                 }
                                 //prev position
                                 if(board[i+1][j]===71){//there was food
@@ -1384,10 +1383,12 @@
 
 
                     function is_eaten() {
-                        board[shape.i][shape.j]===50||board[shape.i][shape.j]===60||board[shape.i][shape.j]===70||
-                        board[shape.i][shape.j]===51||board[shape.i][shape.j]===61||board[shape.i][shape.j]===71
-                        //todo
-                        //!!!!
+                        if(board[shape.i][shape.j]===50||board[shape.i][shape.j]===60||board[shape.i][shape.j]===70||
+                        board[shape.i][shape.j]===51||board[shape.i][shape.j]===61||board[shape.i][shape.j]===71)
+                            return true;
+                        else{
+                            return false;
+                        }
                     }
                     function UpdatePosition() {
                         if(board[shape.i][shape.j]!=50&&board[shape.i][shape.j]!=60&&board[shape.i][shape.j]!=70
@@ -1450,9 +1451,6 @@
                         board[shape.i][shape.j] = 2;
                         var currentTime = new Date();
                         time_elapsed = (currentTime - start_time) / 1000;
-                        if (score >= 20 && time_elapsed <= 10) {
-                            pac_color = "green";
-                        }
                         if(num_life===0){
                             window.clearInterval(interval);
                             window.alert("You Lost!");
@@ -1468,8 +1466,14 @@
                             }
                             is_time_over=true;
                         } else if(!is_time_over){
-                            if(start_monsters_movement)
-                                moveMonster_1()
+                            if(start_monsters_movement){
+                                if(move_monster_now) {
+                                    moveMonster_1()
+                                    move_monster_now = false;
+                                }
+                                else
+                                    move_monster_now=true;
+                            }
                             Draw();
                         }
                     }
