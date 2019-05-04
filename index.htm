@@ -147,6 +147,13 @@
                         width="100%">
                     <tr><button onclick="ShowSection('signup')" href="#">Sign Up</button></tr>
                     <tr><button onclick="ShowSection('login')" href="#">Login</button></tr>
+                    <h1>Instructions:</h1>
+                    <h3>In order to play the game please sign up if you don't have a user and log in if you have. Then
+                    you can change your game's settings and you will be transport to the game after you finish editing.</h3>
+                    <h3>In the game you need to avoid the monsters and try to get as many points as you can!
+                    (bigger point balls worth more points!) and you can add to your game 15 more seconds by
+                    obtaining the clock and get 50 points if you catch the pink moving point!</h3>
+                    <h3>Win the game by getting 150 points with leftover lives!</h3>
                 </table>
             </section>
             <section id="signup" display="none">
@@ -304,13 +311,13 @@
                 <!--choose color-->
                 <script src="jscolor.js"></script>
                 <label><b>Choose color for 5 point ball</b></label>
-                <input id="firstBall" class="jscolor" value="E6301E">
+                <input id="firstBall" class="jscolor" value="F9FF00">
                 <br/>
                 <label><b>Choose color for 15 point ball</b></label>
-                <input id="secondBall" class="jscolor" value="73E66A">
+                <input id="secondBall" class="jscolor" value="FF921A">
                 <br/>
                 <label><b>Choose color for 25 point ball</b></label>
-                <input id="thirdBall" class="jscolor" value="5E37E6">
+                <input id="thirdBall" class="jscolor" value="FF0808">
 
                 <button id="random" onclick="randomize()">Click for random balls bumber, time, number of monsters and balls color.</button>
                 <br />
@@ -563,17 +570,18 @@
                 </script>
             </section>
             <section id="game" display="none">
-                    <button id="start" onclick="Start()">Start</button>
-                    Score:
+                <button id="start" onclick="Start()">Start</button>
+
+                    <h5>Score:</h5>
                     <input id="lblScore" type="text" />
-                    <br />
-                    Time:
+                    <h5>Time:</h5>
                     <input id="lblTime" type="text" />
-                    <br />
-                    Life:
+                    <h5>Life:</h5>
                     <input id="lblLife" type="text" />
-                    <br />
                     <canvas id="canvas" height="600" width="600"></canvas>
+                    <audio id="myAudio">
+                    <source src="pacman.mp3" type="audio/mpeg">
+                     </audio>
                     <script type="text/javascript">
                     var context = canvas.getContext("2d");
                     var shape = new Object();
@@ -591,14 +599,18 @@
                     var location_monster1=[9,0];
                     var location_monster2=[9,9];
                     var location_monster3=[0,9];
+                    var location_moving_point;
                     var num_of_first_balls;
                     var num_of_second_balls;
                     var num_of_third_balls;
+                    var monsters_num=1;
                     var ball_eaten_monster1=0;
                     var ball_eaten_monster2=0;
                     var ball_eaten_monster3=0;
                     var start_monsters_movement=false;
-                    var move_monster_now=true;
+                    var move_monster_now=1;
+                    var ball_eaten_moving_point=0;
+                    var moving_point_alive=true;
                     //defnition to the numbers on the board:
                     //0 nothing
                     //11- 5 point 60%
@@ -608,7 +620,16 @@
                     //4- walls
                     //50,60,70- monsters that on places without food;
                     //51,61,71- monsters that on places with food;
+                    //100- the clock
+                    function playAudio() {
+                        var x = document.getElementById("myAudio");
+                        x.play();
+                    }
 
+                    function pauseAudio() {
+                        var x = document.getElementById("myAudio");
+                        x.pause();
+                    }
                     function SettingIsValid() {
                         if(!isLoggedIn){
                             window.alert("Please log in before you play a game!.")
@@ -728,6 +749,7 @@
                             num_of_second_balls=Math.abs(ballNumbe.value*0.3);
                             num_of_third_balls=Math.abs(ballNumbe.value-num_of_first_balls-num_of_second_balls);
                             var pacman_remain = 1;
+                            monsters_num=document.getElementById("monsterNum").value;
                             start_time = new Date();
                             for (var i = 0; i < 10; i++) {
                                 board[i] = new Array();
@@ -738,9 +760,9 @@
                                     }
                                      else if ((i === location_monster1[0] && j === location_monster1[1])) {
                                         board[i][j] = 50;
-                                    }else if ((i === location_monster2[0] && j === location_monster2[1])&&document.getElementById("monsterNum").value>1) {
+                                    }else if ((i === location_monster2[0] && j === location_monster2[1])&&monsters_num>1) {
                                         board[i][j] = 60;
-                                    }else if ((i === location_monster3[0] && j === location_monster3[1])&&document.getElementById("monsterNum").value>2) {
+                                    }else if ((i === location_monster3[0] && j === location_monster3[1])&&monsters_num>2) {
                                         board[i][j] = 70;
                                     }else {
                                         var randomNum = Math.random();
@@ -765,6 +787,16 @@
                                 addFood(emptyCell[0],emptyCell[1])
                                 food_remain--;
                             }
+                            //set the clock if the food number is less than 90 or wont be space
+                            if(num_of_third_balls+num_of_second_balls+num_of_first_balls<90) {
+                                var emptyCell = findRandomEmptyCell(board);
+                                board[emptyCell[0]][emptyCell[1]] = 100;//the clock
+                            }
+                            if(num_of_third_balls+num_of_second_balls+num_of_first_balls<90) {
+                                var emptyCell = findRandomEmptyCell(board);
+                                board[emptyCell[0]][emptyCell[1]] = 80;//the moving 50 point
+                                location_moving_point=emptyCell;
+                            }
                             keysDown = {};
                             addEventListener("keydown", function (e) {
                                 keysDown[e.code] = true;
@@ -773,7 +805,7 @@
                                 keysDown[e.code] = false;
                             }, false);
                             interval = setInterval(UpdatePosition, 170);
-
+                            playAudio()
                         }//\if setting is valid
                     }                   
                     function findRandomEmptyCell(board) {
@@ -804,7 +836,9 @@
                     }
 
                     function Draw() {
+                        context.fillStyle="black"
                         context.clearRect(0, 0, canvas.width, canvas.height); //clean board
+
                         lblScore.value = score;
                         lblTime.value = time_elapsed;
                         lblLife.value=num_life;
@@ -818,6 +852,7 @@
                         context.font = "italic 700 30px Unknown Font, sans-serif";
                         context.fillStyle = gradient;
                         context.fillText(user_name+" good luck!", 20, 20, 100);
+
 
                         for (var i = 0; i < 10; i++) {
                             for (var j = 0; j < 10; j++) {
@@ -863,15 +898,15 @@
                                     var size=15;
                                     if(board[i][j]===11){
                                         color=document.getElementById("firstBall").value;
-                                        size=15;
+                                        size=10;
                                     }
                                     else if(board[i][j]===12){
                                         color=document.getElementById("secondBall").value;
-                                        size=20;
+                                        size=15;
                                     }
                                     else{//===13
                                         color=document.getElementById("thirdBall").value;
-                                        size=25;
+                                        size=20;
                                     }
                                     color="#"+color;
                                     context.beginPath();
@@ -881,83 +916,69 @@
                                 } else if (board[i][j] === 4) {
                                     context.beginPath();
                                     context.rect(center.x - 30, center.y - 30, 60, 60);
-                                    context.fillStyle = "grey"; //color
-                                    context.fill();
-                                } else if(board[i][j] === 50||board[i][j]===51)  {//first monster
-                                    context.beginPath();
-                                    context.arc(center.x , center.y , 30, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "red"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x + 10, center.y -15, 5, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x - 10, center.y -15, 5, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x , center.y +10, 10, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                }
-                                else if(board[i][j]===60||board[i][j]===61){//second monster
-                                    context.beginPath();
-                                    context.arc(center.x , center.y , 30, 0, 2 * Math.PI); // circle
                                     context.fillStyle = "blue"; //color
                                     context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x + 10, center.y -15, 5, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x - 10, center.y -15, 5, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x , center.y +10, 10, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
+                                } else if(board[i][j] === 50||board[i][j]===51)  {//first monster
+                                    base_image = new Image();
+                                    base_image.src = 'redghost.png';
+                                    context.drawImage(base_image, center.x-30 , center.y-20);
+                                }
+                                else if(board[i][j]===60||board[i][j]===61){//second monster
+                                    base_image = new Image();
+                                    base_image.src = 'blueghost.jpg';
+                                    context.drawImage(base_image, center.x-30 , center.y-20);
                                 }
                                 else if(board[i][j]===70||board[i][j]===71){//third monster
-                                    context.beginPath();
-                                    context.arc(center.x , center.y , 30, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "green"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x + 10, center.y -15, 5, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x - 10, center.y -15, 5, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
-                                    context.beginPath();
-                                    context.arc(center.x , center.y +10, 10, 0, 2 * Math.PI); // circle
-                                    context.fillStyle = "black"; //color
-                                    context.fill();
+                                    base_image = new Image();
+                                    base_image.src = 'pinkghost.jpg';
+                                    context.drawImage(base_image, center.x-30 , center.y-20);
+                                }
+                                else if(board[i][j]===100)//clock
+                                {
+                                    base_image = new Image();
+                                    base_image.src = 'clock.jpg';
+                                    context.drawImage(base_image, center.x-15 , center.y-20);
+
+                                }
+                                else if(board[i][j]===80||board[i][j]===81){//moving pink point
+                                    base_image = new Image();
+                                    base_image.src = 'pinkball.jpg';
+                                    context.drawImage(base_image, center.x-25 , center.y-20);
                                 }
                             }
                         }
                     }
-                    function moveMonster_1(){
-                        var new_i=location_monster1[0]
-                        var new_j=location_monster1[1]
+
+                    function moveMonster_i(numMonster){
+                        var new_i=-1;
+                        var new_j=-1;
+                        if(numMonster===1) {
+                            new_i = location_monster1[0]
+                            new_j = location_monster1[1]
+                        }
+                        else if(numMonster===2){
+                            new_i = location_monster2[0]
+                            new_j = location_monster2[1]
+                        }
+                        else if(numMonster===3){
+                            new_i = location_monster3[0]
+                            new_j = location_monster3[1]
+                        }
                         if(new_i<shape.i)//try move right
                         {
-                            if(!tryRight(new_i,new_j,1)){//cant move right
+                            if(!tryRight(new_i,new_j,numMonster)){//cant move right
                                 if(new_j<shape.j){//try move down
-                                    if(!tryDown(new_i,new_j)){//cant move down
-                                        if(!tryUp(new_i,new_j,1)){//cant move up also- only left do left- will sure succeed
-                                            tryLeft(new_i,new_j,1);
+                                    if(!tryDown(new_i,new_j,numMonster)){//cant move down
+                                        if(!tryUp(new_i,new_j,numMonster)){//cant move up also- only left do left- will sure succeed
+                                            tryLeft(new_i,new_j,numMonster);
                                             return;
                                         }
                                     }
                                 }
                                 else{//try move up
-                                    if(!tryUp(new_i,new_j,1)){//cant move up
-                                        if(!tryDown(new_i,new_j,1)){//cant move down also- only left do left- will sure succeed
-                                            tryLeft(new_i,new_j,1);
+                                    if(!tryUp(new_i,new_j,numMonster)){//cant move up
+                                        if(!tryDown(new_i,new_j,numMonster)){//cant move down also- only left do left- will sure succeed
+                                            tryLeft(new_i,new_j,numMonster);
                                             return;
                                         }
                                     }
@@ -966,18 +987,18 @@
                         }
                         else if(new_i>shape.i)//try move left
                         {
-                            if(!tryLeft(new_i,new_j,1)){//cant move left
+                            if(!tryLeft(new_i,new_j,numMonster)){//cant move left
                                 if(new_j<shape.j){//try move down
-                                    if(!tryDown(new_i,new_j,1)){//cant move down
-                                        if(!tryUp(new_i,new_j,1)){//cant move up also- only left do right- will sure succeed
-                                            tryRight(new_i,new_j,1);
+                                    if(!tryDown(new_i,new_j,numMonster)){//cant move down
+                                        if(!tryUp(new_i,new_j,numMonster)){//cant move up also- only left do right- will sure succeed
+                                            tryRight(new_i,new_j,numMonster);
                                         }
                                     }
                                 }
                                 else{//try move up
-                                    if(!tryUp(new_i,new_j,1)){//cant move up
-                                        if(!tryDown(new_i,new_j,1)){//cant move down also- only left do right- will sure succeed
-                                            tryRight(new_i,new_j,1);
+                                    if(!tryUp(new_i,new_j,numMonster)){//cant move up
+                                        if(!tryDown(new_i,new_j,numMonster)){//cant move down also- only left do right- will sure succeed
+                                            tryRight(new_i,new_j,numMonster);
                                             return;
                                         }
                                     }
@@ -986,10 +1007,10 @@
                         }
                         else{//in the same col as packman
                             if(new_j<shape.j){//try move down
-                                if(!tryDown(new_i,new_j,1)){//cant move down
-                                    if(!tryRight(new_i,new_j,1)){//cant move right
-                                        if(!tryLeft(new_i,new_j,1)){//try left and if not go the opposite direction
-                                            tryUp(new_i,new_j,1);
+                                if(!tryDown(new_i,new_j,numMonster)){//cant move down
+                                    if(!tryRight(new_i,new_j,numMonster)){//cant move right
+                                        if(!tryLeft(new_i,new_j,numMonster)){//try left and if not go the opposite direction
+                                            tryUp(new_i,new_j,numMonster);
                                             return;
                                         }
 
@@ -997,10 +1018,10 @@
                                 }
                             }
                             else{//try move up
-                                if(!tryUp(new_i,new_j,1)){//cant move up
-                                    if(!tryRight(new_i,new_j,1)){//cant move down
-                                        if(!tryLeft(new_i,new_j,1)) {
-                                            tryDown(new_i,new_j,1);
+                                if(!tryUp(new_i,new_j,numMonster)){//cant move up
+                                    if(!tryRight(new_i,new_j,numMonster)){//cant move down
+                                        if(!tryLeft(new_i,new_j,numMonster)) {
+                                            tryDown(new_i,new_j,numMonster);
                                             return;
                                         }
                                     }
@@ -1009,20 +1030,210 @@
                         }
                     }//move monsters
 
+                    function moveMovingPoint(){
+                        var random=Math.random();
+                        var i=location_moving_point[0]
+                        var j=location_moving_point[1]
+                        if(random<0.25){//right
+                            if(!tryRight(i,j,4)){
+                                random=Math.random();
+                                if(random<0.33)//up
+                                {
+                                    if(!tryUp(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//left
+                                            if(!tryLeft(i,j,4))
+                                                tryDown(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryDown(i,j,4))
+                                                tryLeft(i,j,4);
+                                        }
+                                    }
+                                }
+                                else if(random<0.66){//left
+                                    if(!tryUp(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//up
+                                            if(!tryUp(i,j,4))
+                                                tryDown(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryDown(i,j,4))
+                                                tryUp(i,j,4);
+                                        }
+                                    }
+                                }
+                                else{//down
+                                    if(!tryUp(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//up
+                                            if(!tryUp(i,j,4))
+                                                tryLeft(i,j,4);
+                                        }
+                                        else{//left
+                                            if(!tryLeft(i,j,4))
+                                                tryUp(i,j,4);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if(random<0.5){//up
+                            if(!tryUp(i,j,4)){
+                                random=Math.random();
+                                if(random<0.33)//right
+                                {
+                                    if(!tryRight(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//left
+                                            if(!tryLeft(i,j,4))
+                                                tryDown(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryDown(i,j,4))
+                                                tryLeft(i,j,4);
+                                        }
+                                    }
+                                }
+                                else if(random<0.66){//left
+                                    if(!tryUp(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//right
+                                            if(!tryRight(i,j,4))
+                                                tryDown(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryDown(i,j,4))
+                                                tryRight(i,j,4);
+                                        }
+                                    }
+                                }
+                                else{//down
+                                    if(!tryDown(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//right
+                                            if(!tryRight(i,j,4))
+                                                tryLeft(i,j,4);
+                                        }
+                                        else{//left
+                                            if(!tryLeft(i,j,4))
+                                                tryRight(i,j,4);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else if(random<0.75){//left
+                            if(!tryLeft(i,j,4)){
+                                random=Math.random();
+                                if(random<0.33)//up
+                                {
+                                    if(!tryUp(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//right
+                                            if(!tryRight(i,j,4))
+                                                tryDown(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryDown(i,j,4))
+                                                tryRight(i,j,4);
+                                        }
+                                    }
+                                }
+                                else if(random<0.66){//right
+                                    if(!tryRight(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//right
+                                            if(!tryUp(i,j,4))
+                                                tryDown(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryDown(i,j,4))
+                                                tryUp(i,j,4);
+                                        }
+                                    }
+                                }
+                                else{//down
+                                    if(!tryDown(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//up
+                                            if(!tryUp(i,j,4))
+                                                tryRight(i,j,4);
+                                        }
+                                        else{//right
+                                            if(!tryRight(i,j,4))
+                                                tryUp(i,j,4);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else{//down
+                            if(!tryDown(i,j,4)){
+                                random=Math.random();
+                                if(random<0.33)//up
+                                {
+                                    if(!tryUp(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//right
+                                            if(!tryRight(i,j,4))
+                                                tryLeft(i,j,4);
+                                        }
+                                        else{//down
+                                            if(!tryLeft(i,j,4))
+                                                tryRight(i,j,4);
+                                        }
+                                    }
+                                }
+                                else if(random<0.66){//right
+                                    if(!tryRight(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//right
+                                            if(!tryUp(i,j,4))
+                                                tryLeft(i,j,4);
+                                        }
+                                        else{//left
+                                            if(!tryLeft(i,j,4))
+                                                tryUp(i,j,4);
+                                        }
+                                    }
+                                }
+                                else{//left
+                                    if(!tryLeft(i,j,4)){
+                                        random=Math.random();
+                                        if(random<0.5){//up
+                                            if(!tryUp(i,j,4))
+                                                tryRight(i,j,4);
+                                        }
+                                        else{//right
+                                            if(!tryRight(i,j,4))
+                                                tryUp(i,j,4);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     function tryUp(i,j,monsterNum){
                         if(board[i][j-1]!=4){//no wall can go up
                             j=j-1;
                             if(monsterNum===1){//monster number 1
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster1=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster1==12;
+                                        ball_eaten_monster1=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster1=13;
                                     }
                                     else{
-                                        ball_eaten_monster1==13;
+                                        ball_eaten_monster1=100;
                                     }
                                     board[i][j]=51;
                                 }
@@ -1041,16 +1252,18 @@
                             else if(monsterNum===2)//monster 2
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster2=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster2==12;
+                                        ball_eaten_monster2=12;
                                     }
-                                    else{
-                                        ball_eaten_monster2==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster2=13;
                                     }
+                                    else
+                                        ball_eaten_monster2=100;
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
@@ -1069,15 +1282,18 @@
                             else if(monsterNum===3)//monster 3
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster3=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster3==12;
+                                        ball_eaten_monster3=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster3=13;
                                     }
                                     else{
-                                        ball_eaten_monster3==13;
+                                        ball_eaten_monster3=100;
                                     }
                                     board[i][j]=71;
                                 }
@@ -1094,6 +1310,36 @@
                                 location_monster3=[i,j]
 
                             }
+                            else if(monsterNum===4)//moving point
+                            {
+                                //next position
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
+                                    if(board[i][j]===11){
+                                        ball_eaten_moving_point=11;
+                                    }
+                                    else if(board[i][j]===12){
+                                        ball_eaten_moving_point=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_moving_point=13;
+                                    }
+                                    else
+                                        ball_eaten_moving_point=100;
+                                    board[i][j]=81;
+                                }
+                                else{//there is no food
+                                    board[i][j]=80;
+                                }
+                                //prev position
+                                if(board[i][j+1]===81){//there was food
+                                    board[i][j+1]=ball_eaten_moving_point;
+                                }
+                                else{//there wasnt food
+                                    board[i][j+1]=0;
+                                }
+                                location_moving_point=[i,j]
+
+                            }
                             return true;
                         }
                         else{
@@ -1106,16 +1352,18 @@
                             j=j+1;
                             if(monsterNum===1){//monster number 1
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster1=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster1==12;
+                                        ball_eaten_monster1=12;
                                     }
-                                    else{
-                                        ball_eaten_monster1==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster1=13;
                                     }
+                                    else
+                                        ball_eaten_monster1=100;
                                     board[i][j]=51;
                                 }
                                 else{//there is no food
@@ -1134,16 +1382,18 @@
                             else if(monsterNum===2)//monster 2
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster2=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster2==12;
+                                        ball_eaten_monster2=12;
                                     }
-                                    else{
-                                        ball_eaten_monster2==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster2=13;
                                     }
+                                    else
+                                        ball_eaten_monster2=100;
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
@@ -1162,16 +1412,18 @@
                             else if(monsterNum===3)//monster 3
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster3=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster3==12;
+                                        ball_eaten_monster3=12;
                                     }
-                                    else{
-                                        ball_eaten_monster3==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster3=13;
                                     }
+                                    else
+                                        ball_eaten_monster3=100;
                                     board[i][j]=71;
                                 }
                                 else{//there is no food
@@ -1187,6 +1439,36 @@
                                 location_monster3=[i,j]
 
                             }
+                            else if(monsterNum===4)//moving point
+                            {
+                                //next position
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
+                                    if(board[i][j]===11){
+                                        ball_eaten_moving_point=11;
+                                    }
+                                    else if(board[i][j]===12){
+                                        ball_eaten_moving_point=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_moving_point=13;
+                                    }
+                                    else
+                                        ball_eaten_moving_point=100;
+                                    board[i][j]=81;
+                                }
+                                else{//there is no food
+                                    board[i][j]=80;
+                                }
+                                //prev position
+                                if(board[i][j-1]===81){//there was food
+                                    board[i][j-1]=ball_eaten_moving_point;
+                                }
+                                else{//there wasnt food
+                                    board[i][j-1]=0;
+                                }
+                                location_moving_point=[i,j]
+
+                            }
                             return true;
                         }
                         else{
@@ -1199,16 +1481,18 @@
                             i=i+1;
                             if(monsterNum===1){//monster number 1
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster1=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster1==12;
+                                        ball_eaten_monster1=12;
                                     }
-                                    else{
-                                        ball_eaten_monster1==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster1=13;
                                     }
+                                    else
+                                        ball_eaten_monster1=100;
                                     board[i][j]=51;
                                 }
                                 else{//there is no food
@@ -1226,16 +1510,18 @@
                             else if(monsterNum===2)//monster 2
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster2=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster2==12;
+                                        ball_eaten_monster2=12;
                                     }
-                                    else{
-                                        ball_eaten_monster2==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster2=13;
                                     }
+                                    else
+                                        ball_eaten_monster2=100;
                                     board[i][j]=61;
                                 }
                                 else{//there is no food
@@ -1254,16 +1540,18 @@
                             else if(monsterNum===3)//monster 3
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster3=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster3==12;
+                                        ball_eaten_monster3=12;
                                     }
-                                    else{
-                                        ball_eaten_monster3==13;
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster3=13;
                                     }
+                                    else
+                                        ball_eaten_monster3=100;
                                     board[i][j]=71;
                                 }
                                 else{//there is no food
@@ -1277,6 +1565,39 @@
                                     board[i-1][j]=0;
                                 }
                                 location_monster3=[i,j]
+
+                            }
+                            else if(monsterNum===4)//moving point
+                            {
+                                //next position
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
+                                    if(board[i][j]===11){
+                                        ball_eaten_moving_point=11;
+                                    }
+                                    else if(board[i][j]===12){
+                                        ball_eaten_moving_point=12;
+                                    }
+                                    else if(board[i][j]===13) {
+                                        ball_eaten_moving_point = 13;
+                                    }
+                                    else
+                                    {
+                                        ball_eaten_moving_point= 100;
+                                    }
+
+                                    board[i][j]=81;
+                                }
+                                else{//there is no food
+                                    board[i][j]=80;
+                                }
+                                //prev position
+                                if(board[i-1][j]===81){//there was food
+                                    board[i-1][j]=ball_eaten_moving_point;
+                                }
+                                else{//there wasnt food
+                                    board[i-1][j]=0;
+                                }
+                                location_moving_point=[i,j]
 
                             }
                             return true;
@@ -1299,15 +1620,18 @@
 
                             if(monsterNum===1){//monster number 1
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster1=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster1==12;
+                                        ball_eaten_monster1=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster1=13;
                                     }
                                     else{
-                                        ball_eaten_monster1==13;
+                                        ball_eaten_monster1=100;
                                     }
                                     board[i][j]=51;
                                 }
@@ -1321,15 +1645,18 @@
                             else if(monsterNum===2)//monster 2
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster2=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster2==12;
+                                        ball_eaten_monster2=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster2=13;
                                     }
                                     else{
-                                        ball_eaten_monster2==13;
+                                        ball_eaten_monster2=100;
                                     }
                                     board[i][j]=61;
                                 }
@@ -1349,15 +1676,18 @@
                             else if(monsterNum===3)//monster 3
                             {
                                 //next position
-                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13){//there is food
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
                                     if(board[i][j]===11){
                                         ball_eaten_monster3=11;
                                     }
                                     else if(board[i][j]===12){
-                                        ball_eaten_monster3==12;
+                                        ball_eaten_monster3=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_monster3=13;
                                     }
                                     else{
-                                        ball_eaten_monster3==13;
+                                        ball_eaten_monster3=100;
                                     }
                                     board[i][j]=71;
                                 }
@@ -1372,6 +1702,37 @@
                                     board[i+1][j]=0;
                                 }
                                 location_monster3=[i,j]
+
+                            }
+                            else if(monsterNum===4)//moving point
+                            {
+                                //next position
+                                if(board[i][j]===11||board[i][j]===12||board[i][j]===13||board[i][j]===100){//there is food
+                                    if(board[i][j]===11){
+                                        ball_eaten_moving_point=11;
+                                    }
+                                    else if(board[i][j]===12){
+                                        ball_eaten_moving_point=12;
+                                    }
+                                    else if(board[i][j]===13){
+                                        ball_eaten_moving_point=13;
+                                    }
+                                    else {
+                                        ball_eaten_moving_point=100;
+                                    }
+                                    board[i][j]=81;
+                                }
+                                else{//there is no food
+                                    board[i][j]=80;
+                                }
+                                //prev position
+                                if(board[i+1][j]===81){//there was food
+                                    board[i+1][j]=ball_eaten_moving_point;
+                                }
+                                else{//there wasnt food
+                                    board[i+1][j]=0;
+                                }
+                                location_moving_point=[i,j]
 
                             }
                             return true;
@@ -1390,9 +1751,11 @@
                             return false;
                         }
                     }
+
                     function UpdatePosition() {
                         if(board[shape.i][shape.j]!=50&&board[shape.i][shape.j]!=60&&board[shape.i][shape.j]!=70
-                        &&board[shape.i][shape.j]!=51&&board[shape.i][shape.j]!=61&&board[shape.i][shape.j]!=71)
+                        &&board[shape.i][shape.j]!=51&&board[shape.i][shape.j]!=61&&board[shape.i][shape.j]!=71&&
+                            board[shape.i][shape.j]!=80&&board[shape.i][shape.j]!=81)
                             board[shape.i][shape.j] = 0;
                         var x = GetKeyPressed();
                         if (x === 1) {
@@ -1434,24 +1797,68 @@
                                 score+=25;
                             }
                         }
+                        if(board[shape.i][shape.j]===100)//clock
+                        {
+                            _maxTime += 15;
+                            //alert user 15 sec were adde
+                            var w = window.open('','','width=100,height=100')
+                            w.document.write('15 seconds added!')
+                            w.focus()
+                            setTimeout(function() {w.close();}, 1000)
+                            board[shape.i][shape.j]=0;
+                        }
+                        else if(board[shape.i][shape.j]===80||board[shape.i][shape.j]===81){
+                            score+=50;
+                            board[shape.i][shape.j]=0;
+                            moving_point_alive=false;
+                        }
                         if(is_eaten() ){//loss
                             num_life-=1;
                             if(score>=20)
                                 score-=20;
                             else
                                 score=0;
-
+                            if(board[location_monster1[0]][location_monster1[1]]==51)//monster 1
+                                board[location_monster1[0]][location_monster1[1]]=ball_eaten_monster1;
+                            else
+                                board[location_monster1[0]][location_monster1[1]]=0;
                             location_monster1=[9,0];
-                            location_monster2=[9,9];
-                            location_monster3=[0,9];
-                            start();
-                            return;
+                            board[9][0]=50;
 
+                            if(monsters_num>1){//monster 2
+                                if(board[location_monster2[0]][location_monster2[1]]==61)
+                                    board[location_monster2[0]][location_monster2[1]]=ball_eaten_monster2;
+                                else
+                                    board[location_monster2[0]][location_monster2[1]]=0;
+                                location_monster2=[9,9];
+                                board[9][9]=60;
+                            }
+
+                            if(monsters_num>2){//monster 3
+                                if(board[location_monster3[0]][location_monster3[1]]==71)
+                                    board[location_monster3[0]][location_monster3[1]]=ball_eaten_monster3;
+                                else
+                                    board[location_monster3[0]][location_monster3[1]]=0;
+                                location_monster3=[0,9];
+                                board[0][9]=70;
+                            }
+
+                            start_monsters_movement=false;
+                            //Start();
+                            var newPackLocation=findRandomEmptyCell(board);
+                            board[shape.i][shape.j]=0;
+                            board[newPackLocation[0]][newPackLocation[1]]=2;
+                            shape.i=newPackLocation[0];
+                            shape.j=newPackLocation[1];
+                            Draw();
+                            return;
                         }
                         board[shape.i][shape.j] = 2;
                         var currentTime = new Date();
                         time_elapsed = (currentTime - start_time) / 1000;
-                        if(num_life===0){
+                        if(num_life<=0){
+                            Draw();
+                            pauseAudio()
                             window.clearInterval(interval);
                             window.alert("You Lost!");
                         }
@@ -1465,18 +1872,32 @@
                                 window.alert("We have a Winner!!!");
                             }
                             is_time_over=true;
-                        } else if(!is_time_over){
+                        }
+                        else if(!is_time_over){
                             if(start_monsters_movement){
-                                if(move_monster_now) {
-                                    moveMonster_1()
-                                    move_monster_now = false;
+                                if(move_monster_now===3) {
+                                    moveMonster_i(1)
+                                    if(monsters_num>1)
+                                        moveMonster_i(2);
+                                    if(monsters_num>2)
+                                        moveMonster_i(3);
+                                    if(moving_point_alive)
+                                        moveMovingPoint()
+                                    move_monster_now =1;
                                 }
                                 else
-                                    move_monster_now=true;
+                                    move_monster_now=move_monster_now+1;
                             }
                             Draw();
                         }
                     }
+
+                    window.addEventListener("keydown", function(e) {
+                        // space and arrow keys
+                        if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+                            e.preventDefault();
+                        }
+                    }, false);
                     </script>
             </section>
 
