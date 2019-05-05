@@ -30,6 +30,10 @@
         }
         window.addEventListener("load", PageLoaded, false);
     </script>
+
+    <script src="jquery-3.4.0.min.js"></script>
+    <script src="jquery.validate.js"></script>
+    <script src="jQueryCheck.js"></script>
 </head>
 
 
@@ -277,6 +281,8 @@
                         </div>
                     </div>
                 </form>
+
+
                 <script type="text/javascript">
                     function signup(){
                         var userName=document.getElementById("user_name").value;
@@ -625,6 +631,7 @@
                     var move_monster_now=1;
                     var ball_eaten_moving_point=0;
                     var moving_point_alive=true;
+                    var add_15=0;
                     //defnition to the numbers on the board:
                     //0 nothing
                     //11- 5 point 60%
@@ -854,7 +861,11 @@
                         context.clearRect(0, 0, canvas.width, canvas.height); //clean board
 
                         lblScore.value = score;
-                        lblTime.value = time_elapsed;
+                        var time=_maxTime-time_elapsed+add_15;
+                        var time_str=""+time
+                        if(time_str.length>5)
+                            time_str=time_str.substr(0,5)
+                        lblTime.value =time_str
                         lblLife.value=num_life;
                         //draw the user name on canvas
                         gradient = context.createLinearGradient(0, 0, canvas.width, 0);
@@ -1813,17 +1824,11 @@
                         }
                         if(board[shape.i][shape.j]===100)//clock
                         {
-                            _maxTime += 15;
-                            //alert user 15 sec were adde
-                            var w = window.open('','','width=100,height=100')
-                            w.document.write('15 seconds added!')
-                            w.focus()
-                            setTimeout(function() {w.close();}, 1000)
-                            board[shape.i][shape.j]=0;
+                            add_15=15;
+
                         }
                         else if(board[shape.i][shape.j]===80||board[shape.i][shape.j]===81){
                             score+=50;
-                            board[shape.i][shape.j]=0;
                             moving_point_alive=false;
                         }
                         if(is_eaten() ){//loss
@@ -1864,19 +1869,28 @@
                             board[newPackLocation[0]][newPackLocation[1]]=2;
                             shape.i=newPackLocation[0];
                             shape.j=newPackLocation[1];
-                            Draw();
-                            return;
+                            if(num_life>0){
+                                packman_last_move="right";
+                                Draw();
+                                return;
+                            }
                         }
+                        var time=_maxTime-time_elapsed+add_15;
+
                         board[shape.i][shape.j] = 2;
                         var currentTime = new Date();
                         time_elapsed = (currentTime - start_time) / 1000;
+                        var time=_maxTime-time_elapsed+add_15;
                         if(num_life<=0){
-                            Draw();
                             pauseAudio()
+                            time_elapsed=_maxTime+add_15
+                            Draw();
                             window.clearInterval(interval);
                             window.alert("You Lost!");
+                            is_time_over=true;
+                            window.alert("To start another game press on th Start button");
                         }
-                        else if (time_elapsed > _maxTime&&!is_time_over){
+                        else if (time<=0&&!is_time_over){//the time is over
                             if(score<150) {
                                 window.clearInterval(interval);
                                 window.alert("You can do better");
