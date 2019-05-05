@@ -296,6 +296,7 @@
                         var month=date[1];
                         var year=date[0];
                         //todo checks!
+                        //todo checks!
                         isSuccess=addToArray(userName,password,firstname,lastname,email,day,month,year);
                         if(!isSuccess){
                             window.alert("user name already exist. Please pick new one and try again");
@@ -496,10 +497,15 @@
                             <h2>About</h2>
                         </div>
                         <div class="modal-body">
-                            <p>Liad Bercovich 209372887 & Amit Moshe 206408121</p>
-                            <p>JQuery usage:</p>
-                            <p>Template usage:</p>
-                            <p>Difficulties:</p>
+                            <p>Liad Bercovich 209372887 & Amit Moshe 206480121</p>
+                            <p><b>JQuery usage:</b></p>
+                            <p>1.On sign up We used to validate that user name has only letters,
+                                to validate that password had only letters and numbers, to validate email address
+                            and to check that all field was filled before trying to sign up.</p>
+                            <p>2.We used jQuery for windows settings.</p>
+                            <p><b>Template usage:</b></p>
+                            <p><b>Difficulties:</b> </p>
+                            <p>It was hard to learn the jQuery syntax at first and also to make all features in the game. </p>
                         </div>
                         <div class="modal-footer">
                             <h3>Modal Footer</h3>
@@ -535,6 +541,12 @@
                                 event.preventDefault();
                             }
                         }
+
+                        $(document).keydown(function(event) {
+                            if (event.keyCode == 27) {
+                                $('#myModal').hide();
+                            }
+                        });
 
                     </script>
 
