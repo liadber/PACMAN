@@ -1,73 +1,8 @@
 //script to do all the checks in registration
 
-/**
 $(document).ready(function () {
-    $("#signUpForm").validate({
-        rules: {
-            user_name: {
-                required: true
-            },
-            pass_w: {
-                required: true,
-                minlength: 8,
-                regexp: '^[a-zA-Z0-9]*$'
-            },
-            firstname: {
-                required: true,
-                regexp: '^[a-zA-Z]*$'
-            },
-            lastname: {
-                required: true,
-                regexp: '^[a-zA-Z]*$'
-            },
-            email: {
-                required: true,
-                email: true
-            },
-            birthday: {
-                required: true,
-            }
-        },
-        massages: {
-            user_name: {
-                required: "This field cannot be empty",
-            },
-            pass_w: {
-                required: "This field cannot be empty",
-                minlength: "password must be at least 8 characters",
-                regexp: "password must contain only numbers and letters",
-            },
-            firstname: {
-                required: "This field cannot be empty",
-                regexp: "first name must contains only letters",
-            },
-            lastname: {
-                required: "This field cannot be empty",
-                regexp: "last name must contains only letters",
-            },
-            email: {
-                required: "This field cannot be empty",
-                email: "Please enter a valid email address"
-            },
-            birthday: {
-                required: "This field cannot be empty",
-            }
-        }
-    });
-    jQuery.validator.addMethod(
-        'regexp',
-        function (value, element, regexp) {
-            var re = new RegExp(regexp);
-            return this.optional(element) || re.test(value);
-        },
-        "Please check your input."
-    );
-});
-**/
 
-$(document).ready(function () {
-    //username
-
+       //username
     jQuery.validator.addMethod("unique_username", function(value, element) {
         for(var i=0;i<users.length;i++)
         {
@@ -115,11 +50,24 @@ $(document).ready(function () {
                 required: true,
                 email: true
             }
+
+
         },
-        submitHandler: function (form) {
+        messages: {
+            firstname: "Please enter your firstname",
+            lastname: "Please enter your lastname",
+            user_name: {
+                required: "Please enter a username",
+            },
+            pass_w: {
+                required: "Please provide a password",
+                minlength: "Your password must be at least 8 characters long"
+            },
+            email: "Please enter a valid email address",
+        },
 
-            signup();
-
+        submitHandler: function(form) {
+            Submit();
         }
     });
 });
