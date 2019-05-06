@@ -257,34 +257,32 @@
                         <p>Please fill in this form to create an account.</p>
 
                         <label for="user_name"><b>User Name</b></label>
-                        <input id="user_name" type="text" placeholder="user_name" name="user_name" autocomplete="on">
+                        <input id="user_name" type="text" placeholder="user_name" name="user_name" required>
                         <br />
 
                         <label for="pass_w"><b>Password</b></label>
-                        <input id="pass_w" type="password" placeholder="Password" name="pass_w" autocomplete="on">
+                        <input required id="pass_w" type="password" placeholder="Password" name="pass_w">
                         <br />
 
                         <label for="firstname"><b>First Name</b></label>
-                        <input id="firstname" type="text" placeholder="Firstname" name="firstname" autocomplete="on">
+                        <input required id="firstname" type="text" placeholder="Firstname" name="firstname">
                         <br />
 
                         <label for="lastname"><b>Last Name</b></label>
-                        <input id="lastname" type="text" placeholder="Lastname" name="lastname" autocomplete="on">
+                        <input required id="lastname" type="text" placeholder="Lastname" name="lastname">
                         <br />
 
                         <label for="user_email"><b>Email</b></label>
-                        <input id="user_email" type="email" placeholder="john@doe.com" name="user_email" autocomplete="on">
+                        <input required id="user_email" type="email" placeholder="john@doe.com" name="user_email">
                         <br />
                         <br/>
                         <label for="birthday"><b>Birth date</b></label>
-                        <input id="birthday" type="date"  name="birthday">
+                        <input required id="birthday" type="date"  name="birthday">
                         <br />
                         <br />
-
-                        <div class="clearfix">
-                            <input type="submit" class="signupbtn" Value="Submit">
+                            <button type="submit" class="signupbtn" onclick="Submit()">Sign Up</button>
                             <button type="button" class="cancelbtn">Reset</button>
-                        </div>
+
                     </div>
                 </form>
 
@@ -301,12 +299,20 @@
                         var day=date[2];
                         var month=date[1];
                         var year=date[0];
-                        isSuccess=addToArray(userName,password,firstname,lastname,email,day,month,year);
-                        if(!isSuccess){
-                            window.alert("user name already exist. Please pick new one and try again");
+                        if(userName==""||password==""||firstname==""||lastname==""||
+                            email==""||password.length<8 ){
+                            window.alert("One or more fields are not filled correctly. Please try again. ");
+
                         }
-                        else{
-                            window.alert("User added successfully! In order to log in please press on the log in button on the top of the page");
+                        else {
+                            isSuccess = addToArray(userName, password, firstname, lastname, email, day, month, year);
+                            if (!isSuccess) {
+                                window.alert("user name already exist. Please pick new one and try again");
+                            }
+
+                            else {
+                                window.alert("User added successfully! In order to log in please press on the log in button on the top of the page");
+                            }
                         }
                     }
                 </script>
