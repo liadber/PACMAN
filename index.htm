@@ -5,7 +5,7 @@
 <head>
     <title>Pacman - Liad and Amit</title>
     <script type="text/javascript">
-        var isLoggedIn=true;
+        var isLoggedIn=false;
         var user_name;
         function PageLoaded() {
             ShowSection('welcome');
@@ -647,6 +647,7 @@
                     var ball_eaten_moving_point=0;
                     var moving_point_alive=true;
                     var add_15=0;
+                    var num_of_eaten_food=0;
                     //defnition to the numbers on the board:
                     //0 nothing
                     //11- 5 point 60%
@@ -824,11 +825,11 @@
                                 food_remain--;
                             }
                             //set the clock if the food number is less than 90 or wont be space
-                            if(num_of_third_balls+num_of_second_balls+num_of_first_balls<90) {
+                            if(document.getElementById("ballNumbe").value<90) {
                                 var emptyCell = findRandomEmptyCell(board);
                                 board[emptyCell[0]][emptyCell[1]] = 100;//the clock
                             }
-                            if(num_of_third_balls+num_of_second_balls+num_of_first_balls<90) {
+                            if(document.getElementById("ballNumbe").value<90) {
                                 var emptyCell = findRandomEmptyCell(board);
                                 board[emptyCell[0]][emptyCell[1]] = 80;//the moving 50 point
                                 location_moving_point=emptyCell;
@@ -842,8 +843,19 @@
                             }, false);
                             interval = setInterval(UpdatePosition, 170);
                             playAudio()
+                            countFood()
                         }//\if setting is valid
-                    }                   
+                    }
+                    function countFood(){
+                        num_of_eaten_food=0;
+                        for(var i=0;i<10;i++){
+                            for(var j=0;j<10;j++){
+                                if (board[i][j]===11||board[i][j]===12||board[i][j]===13||
+                                    board[i][j]===51||board[i][j]===61||board[i][j]===71||board[i][j]===81)
+                                    num_of_eaten_food+=1;
+                            }
+                        }
+                    }
                     function findRandomEmptyCell(board) {
                         var i = Math.floor((Math.random() * 9) + 1);
                         var j = Math.floor((Math.random() * 9) + 1);
@@ -1896,7 +1908,14 @@
                         var currentTime = new Date();
                         time_elapsed = (currentTime - start_time) / 1000;
                         var time=_maxTime-time_elapsed+add_15;
-                        if(num_life<=0){
+                        countFood()
+                        if(num_of_eaten_food<=0){
+                            Draw()
+                            window.clearInterval(interval);
+                            window.alert("We have a Winner!!! You ate all the food!");
+                            is_time_over=true;
+                        }
+                        else if(num_life<=0){
                             pauseAudio()
                             time_elapsed=_maxTime+add_15
                             Draw();
