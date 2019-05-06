@@ -1,5 +1,6 @@
 //script to do all the checks in registration
 
+
 $(document).ready(function () {
 
        //username
@@ -27,7 +28,7 @@ $(document).ready(function () {
 
 
 
-    $('#signUpForm').validate({
+    $('form[id="signUpForm"]').validate({
         rules: {
             user_name: {
                 required: true,
@@ -46,28 +47,34 @@ $(document).ready(function () {
                 required: true,
                 letters_check: true
             },
-            email: {
+            user_email: {
                 required: true,
                 email: true
             }
 
-
         },
         messages: {
-            firstname: "Please enter your firstname",
-            lastname: "Please enter your lastname",
+            firstname: {
+                required: 'Please enter your first name'
+            },
+            lastname: {
+                required: 'Please enter your last name'
+            },
             user_name: {
-                required: "Please enter a username",
+                required: 'Please enter a username',
             },
             pass_w: {
-                required: "Please provide a password",
-                minlength: "Your password must be at least 8 characters long"
+                required: 'Please provide a password',
+                minlength: 'Your password must be at least 8 characters long'
             },
-            email: "Please enter a valid email address",
+            email:{
+                email: 'Please enter a valid email address'
+            } ,
         },
 
+
         submitHandler: function(form) {
-            Submit();
-        }
+            form.submit();
+         }
     });
 });
