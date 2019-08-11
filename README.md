@@ -1,6 +1,7 @@
 # Pacman-Game
 A Pacman game website I created with my partner @Amit223.
 This is our first trial in Java Script using the possibilties of HTML5 with <canvas>.
+Also first trial in JQuery.
 
 1. Create your own user for the session on "Sign Up"
 2. Log in on "Login"
